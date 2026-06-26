@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laida91_3D | Local Storage Catalog</title>
+    <title>Laida91_3D | Upload Gallery Catalog</title>
     <style>
         :root {
             --primary: #9b59b6; 
@@ -112,7 +112,7 @@
         .admin-mode-active .image-box img { cursor: pointer; }
         .admin-mode-active .image-box img:hover { opacity: 0.6; }
         .admin-mode-active .image-box::after {
-            content: "📸 Click to Change";
+            content: "📸 Click to Upload";
             position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.7); color: #fff; font-size: 0.75rem; padding: 2px 8px; border-radius: 10px; pointer-events: none;
         }
@@ -138,6 +138,9 @@
         .admin-form-container h3 { margin-top: 0; color: var(--accent); }
         .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
         .form-grid input, .form-grid select { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; }
+        
+        /* Input file invisibile */
+        #hidden-file-input { display: none; }
 
         .faq-container { background: #111; padding: 40px; border-radius: 15px; margin-top: 60px; }
         .faq-item { margin-bottom: 25px; border-left: 3px solid var(--primary); padding-left: 20px; }
@@ -147,6 +150,9 @@
     </style>
 </head>
 <body>
+
+<!-- Input file nascosto per aprire la galleria -->
+<input type="file" id="hidden-file-input" accept="image/*">
 
 <div class="utility-bar">
     <button class="util-btn active-lang" id="lang-it" onclick="setLanguage('it')">🇮🇹 IT</button>
@@ -172,11 +178,10 @@
 
     <div class="admin-form-container" id="addForm">
         <h3 id="txt-form-title">Aggiungi Nuova Miniatura</h3>
+        <p style="font-size:0.85rem; color:var(--accent);">Nota: Crea la scheda, poi clicca sui riquadri immagine per caricare le foto dalla galleria.</p>
         <div class="form-grid">
             <input type="text" id="formTitle" placeholder="Titolo">
             <input type="text" id="formDesc" placeholder="Descrizione / Scala">
-            <input type="text" id="formImg2D" placeholder="Es: elsa_concept.jpg (o lascia vuoto)">
-            <input type="text" id="formImg3D" placeholder="Es: elsa_stampa.jpg (o lascia vuoto)">
             <input type="text" id="formSubCat" placeholder="Sotto-categoria / Set">
             <input type="text" id="formLink" placeholder="Link Store (Vinted/Cults)">
             <select id="formMacro">
@@ -184,7 +189,7 @@
                 <option value="various">Various Artists</option>
             </select>
         </div>
-        <button class="admin-btn green" id="txt-save-btn" onclick="addNewProduct()">Aggiungi</button>
+        <button class="admin-btn green" id="txt-save-btn" onclick="addNewProduct()">Aggiungi Scheda</button>
     </div>
     
     <div class="macro-nav">
@@ -219,19 +224,20 @@
     let selectedMacro = 'all';
     let selectedSub = 'all';
     let currentLang = 'it';
+    let activeUploadTarget = null; // Tiene traccia di quale card e tipo immagine stiamo modificando
 
     const translations = {
         it: { tagline: "Catalogo Dinamico Autogestito", adminTitle: "🔒 Editor Catalogo Attivo", addItem: "＋ Quick Add", reset: "⚠️ Reset", formTitle: "Aggiungi Nuova Miniatura", save: "Aggiungi", allMacro: "Mostra Tutto", allSub: "Tutti i Set", faqHeader: "Domande Frequenti (FAQ)", btnStore: "Vedi Store" },
         en: { tagline: "Self-Managed Dynamic Catalog", adminTitle: "🔒 Catalog Editor Active", addItem: "＋ Quick Add", reset: "⚠️ Reset", formTitle: "Add New Miniature", save: "Add", allMacro: "Show All", allSub: "All Sets", faqHeader: "Frequently Asked Questions (FAQ)", btnStore: "View Store" }
     };
 
-    // Placeholder di default che rimandano alla cartella img/ locale se non diversamente specificato
     let products = JSON.parse(localStorage.getItem('l91_products')) || [
-        { id: 1, title: "Cyber-Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "img/placeholder_2d.jpg", img3D: "img/placeholder_3d.jpg", macro: "original", sub: "Cyber-Royalty", link: "#" }
+        { id: 1, title: "Cyber-Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "", img3D: "", macro: "original", sub: "Cyber-Royalty", link: "#" }
     ];
 
     window.onload = function() {
         setLanguage('it');
+        setupImageUploader();
     };
 
     function setLanguage(lang) {
@@ -265,43 +271,61 @@
         form.style.display = (form.style.display === 'block') ? 'none' : 'block';
     }
 
-    // Corregge automaticamente il testo per puntare alla cartella img/ se l'utente mette solo il nome del file
-    function fixImgPath(path, fallbackText) {
-        if (!path) return `img/${fallbackText}`;
-        if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('img/')) {
-            return path;
-        }
-        return `img/${path}`;
-    }
-
     function addNewProduct() {
         const title = document.getElementById('formTitle').value || "Nuovo Modello";
         const desc = document.getElementById('formDesc').value || "Scala 40mm";
-        let img2D = document.getElementById('formImg2D').value;
-        let img3D = document.getElementById('formImg3D').value;
         const sub = document.getElementById('formSubCat').value || "Generico";
         const link = document.getElementById('formLink').value || "#";
         const macro = document.getElementById('formMacro').value;
 
-        img2D = fixImgPath(img2D, "placeholder_2d.jpg");
-        img3D = fixImgPath(img3D, "placeholder_3d.jpg");
-
-        products.push({ id: Date.now(), title, desc, img2D, img3D, macro, sub, link });
+        products.push({ id: Date.now(), title, desc, img2D: "", img3D: "", macro, sub, link });
         saveToLocalStorage();
         toggleAddForm();
     }
 
-    function changeImage(id, type) {
+    // Gestione dell'input file per il ridimensionamento automatico delle immagini
+    function setupImageUploader() {
+        const fileInput = document.getElementById('hidden-file-input');
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file || !activeUploadTarget) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Creiamo un canvas per ridimensionare l'immagine alle proporzioni corrette per le miniature (400x600 px)
+                    const canvas = document.createElement('canvas');
+                    canvas.width = 400;
+                    canvas.height = 600;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Disegna l'immagine adattandola (ritaglio stile cover)
+                    const scale = Math.max(canvas.width / img.width, canvas.height / img.height);
+                    const x = (canvas.width - img.width * scale) / 2;
+                    const y = (canvas.height - img.height * scale) / 2;
+                    ctx.drawImage(img, x, y, img.width * scale, img.height * scale);
+                    
+                    // Converte in formato compresso (WebP o JPEG se non supportato)
+                    const optimizedDataUrl = canvas.toDataURL('image/jpeg', 0.75);
+                    
+                    // Assegna la foto al prodotto corretto
+                    const index = products.findIndex(p => p.id === activeUploadTarget.id);
+                    if (index !== -1) {
+                        products[index][activeUploadTarget.type] = optimizedDataUrl;
+                        renderCatalog();
+                    }
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function triggerImageUpload(id, type) {
         if(!adminMode) return;
-        let newUrl = prompt(type === 'img2D' ? "Nome foto 2D (es: elsa.jpg) o URL intero:" : "Nome foto 3D (es: elsa_print.jpg) o URL intero:");
-        if(newUrl) {
-            newUrl = fixImgPath(newUrl, type === 'img2D' ? "placeholder_2d.jpg" : "placeholder_3d.jpg");
-            const index = products.findIndex(p => p.id === id);
-            if(index !== -1) {
-                products[index][type] = newUrl;
-                renderCatalog();
-            }
-        }
+        activeUploadTarget = { id: id, type: type };
+        document.getElementById('hidden-file-input').click();
     }
 
     function removeProduct(id) {
@@ -345,10 +369,13 @@
                 card.className = "comparison-card";
                 card.setAttribute('data-prod-id', p.id);
                 
+                const src2D = p.img2D || "https://via.placeholder.com/400x600?text=Carica+Foto+2D";
+                const src3D = p.img3D || "https://via.placeholder.com/400x600?text=Carica+Foto+3D";
+
                 let cardInner = `
                     <div class="image-box">
-                        <img src="${p.img2D}" alt="2D" onclick="changeImage(${p.id}, 'img2D')" onerror="this.src='https://via.placeholder.com/400x600?text=In attesa di foto'">
-                        <img src="${p.img3D}" alt="3D" onclick="changeImage(${p.id}, 'img3D')" onerror="this.src='https://via.placeholder.com/400x600?text=In attesa di foto'">
+                        <img src="${src2D}" alt="2D" onclick="triggerImageUpload(${p.id}, 'img2D')">
+                        <img src="${src3D}" alt="3D" onclick="triggerImageUpload(${p.id}, 'img3D')">
                     </div>
                     <div class="card-info">
                 `;
