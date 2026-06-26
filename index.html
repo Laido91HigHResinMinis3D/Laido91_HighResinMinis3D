@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laida91_3D | Professional Catalog</title>
+    <style>
+        :root {
+            --primary: #9b59b6; 
+            --accent: #00d4ff;
+            --dark: #0f0f0f;
+            --card-bg: #1a1a1a;
+            --text: #ffffff;
+            --gray: #888;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            margin: 0;
+            background-color: var(--dark);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        /* BARRA UTILITY IN ALTO (EDIT & LINGUA) */
+        .utility-bar {
+            background: #111;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .util-btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .util-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .util-btn.active-lang { background: var(--primary); border-color: var(--primary); }
+
+        /* BARRA ADMIN (COMPARE DOPO LOGIN) */
+        .admin-bar {
+            background: #222;
+            padding: 10px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .admin-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+        .admin-btn.green { background: #2ecc71; }
+
+        header {
+            height: 30vh;
+            background: linear-gradient(to bottom, rgba(155, 89, 182, 0.2), var(--dark)), #151515;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        h1 { font-size: 3.5rem; margin: 0; text-transform: uppercase; letter-spacing: 5px; }
+        .tagline { font-size: 1.3rem; color: var(--accent); font-weight: 300; }
+
+        .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
+
+        /* NAVIGAZIONE CATEGORIE */
+        .macro-nav { text-align: center; margin-bottom: 20px; }
+        .sub-nav { text-align: center; margin-bottom: 40px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+        .filter-btn {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--text);
+            padding: 10px 25px;
+            margin: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); box-shadow: 0 0 15px rgba(155, 89, 182, 0.5); }
+        
+        .sub-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: #bbb;
+            padding: 6px 15px;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+        .sub-btn:hover, .sub-btn.active { border-color: var(--accent); color: var(--accent); }
+
+        /* GRIGLIA PRODOTTI */
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .comparison-card { background: var(--card-bg); border-radius: 15px; overflow: hidden; border: 1px solid #333; position: relative; display: flex; flex-direction: column; }
+        .comparison-card.hide { display: none; }
+
+        .image-box { display: flex; background: #000; }
+        .image-box img { width: 50%; object-fit: cover; height: 280px; border: 1px solid #111; }
+
+        .card-info { padding: 20px; text-align: center; flex-grow: 1; }
+        .card-info h3 { margin: 0 0 10px 0; }
+        .card-info p { font-size: 0.9rem; color: #bbb; margin: 0 0 15px 0; }
+        
+        .badge { display: inline-block; background: #333; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; color: var(--accent); margin-bottom: 10px; }
+
+        .btn-link { display: inline-block; background: #fff; color: #000; padding: 8px 18px; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin: 3px; }
+        .btn-link:hover { background: var(--accent); }
+
+        /* FORM DI AGGIUNTA */
+        .admin-form-container {
+            background: #151515;
+            border: 1px solid var(--accent);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            display: none;
+        }
+        .admin-form-container h3 { margin-top: 0; color: var(--accent); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-grid input, .form-grid select { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; }
+
+        /* FAQ */
+        .faq-container { background: #111; padding: 40px; border-radius: 15px; margin-top: 60px; }
+        .faq-item { margin-bottom: 25px; border-left: 3px solid var(--primary); padding-left: 20px; }
+        .faq-item h3 { margin: 0 0 10px 0; color: var(--accent); }
+
+        footer { text-align: center; padding: 40px; background: #050505; border-top: 1px solid #222; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+<!-- BARRA UTILITY IN ALTO -->
+<div class="utility-bar">
+    <button class="util-btn active-lang" id="lang-it" onclick="setLanguage('it')">🇮🇹 IT</button>
+    <button class="util-btn" id="lang-en" onclick="setLanguage('en')">🇬🇧 EN</button>
+    <button class="util-btn" id="edit-master-btn" onclick="unlockAdmin()">⚙️ Edit</button>
+</div>
+
+<!-- BARRA ADMIN -->
+<div class="admin-bar" id="adminBar">
+    <span id="txt-admin-title">🔒 Editor Catalogo Attivo</span>
+    <div>
+        <button class="admin-btn green" id="txt-add-item-btn" onclick="toggleAddForm()">＋ Aggiungi Articolo</button>
+        <button class="admin-btn" id="txt-reset-btn" onclick="clearCatalogData()">⚠️ Resetta Tutto</button>
+    </div>
+</div>
+
+<header>
+    <h1>Laida91_3D</h1>
+    <p class="tagline" id="txt-tagline">Catalogo Dinamico Autogestito</p>
+</header>
+
+<div class="container">
+
+    <!-- FORM DI INSERIMENTO NUOVO ARTICOLO -->
+    <div class="admin-form-container" id="addForm">
+        <h3 id="txt-form-title">Aggiungi Nuova Miniatura al Catalogo</h3>
+        <div class="form-grid">
+            <input type="text" id="formTitle" placeholder="Titolo (es. Elsa Vol.1)">
+            <input type="text" id="formDesc" placeholder="Breve descrizione o scala">
+            <input type="text" id="formImg2D" placeholder="URL Immagine Concept 2D">
+            <input type="text" id="formImg3D" placeholder="URL Immagine Stampa 3D">
+            <input type="text" id="formSubCat" placeholder="Sotto-categoria / Set (es. Cyber-Royalty)">
+            <input type="text" id="formLink" placeholder="Link Esterno (Cults3D / Vinted)">
+            <select id="formMacro">
+                <option value="original">Original Concept</option>
+                <option value="various">Various Artists</option>
+            </select>
+        </div>
+        <button class="admin-btn green" id="txt-save-btn" onclick="addNewProduct()">Salva nel Catalogo</button>
+    </div>
+    
+    <!-- MACRO CATEGORIE -->
+    <div class="macro-nav">
+        <button class="filter-btn active" id="macro-all" onclick="filterMacro('all')">Mostra Tutto</button>
+        <button class="filter-btn" id="macro-original" onclick="filterMacro('original')">Original Concept</button>
+        <button class="filter-btn" id="macro-various" onclick="filterMacro('various')">Various Artists</button>
+    </div>
+
+    <!-- SOTTO CATEGORIE DINAMICHE -->
+    <div class="sub-nav" id="subCategoryContainer"></div>
+
+    <!-- GRIGLIA ARTICOLI -->
+    <div class="portfolio-grid" id="catalogGrid"></div>
+
+    <!-- FAQ SECTION -->
+    <section class="faq-container">
+        <center><h2 id="txt-faq-header">Domande Frequenti (FAQ)</h2></center>
+        <div class="faq-item">
+            <h3 id="txt-faq-q1">Che tipo di resina utilizzi per le stampe fisiche?</h3>
+            <p id="txt-faq-a1">Utilizzo esclusivamente <strong>Anycubic V2 HD</strong> per garantire dettagli nitidissimi e superfici pronte alla pittura.</p>
+        </div>
+        <div class="faq-item">
+            <h3 id="txt-faq-q2">In che scala sono disponibili le miniature?</h3>
+            <p id="txt-faq-a1_2">I modelli standard sono in scala <strong>40mm</strong>. Su richiesta, quasi tutti possono essere realizzati a <strong>75mm</strong>.</p>
+        </div>
+    </section>
+</div>
+
+<footer>
+    <p>&copy; 2026 Laida91_3D</p>
+</footer>
+
+<script>
+    const securePassword = "laida2026"; 
+    let adminMode = false;
+    let selectedMacro = 'all';
+    let selectedSub = 'all';
+    let currentLang = 'it';
+
+    // Vocabolario traduzioni fisse
+    const translations = {
+        it: {
+            tagline: "Catalogo Dinamico Autogestito",
+            adminTitle: "🔒 Editor Catalogo Attivo",
+            addItem: "＋ Aggiungi Articolo",
+            reset: "⚠️ Resetta Tutto",
+            formTitle: "Aggiungi Nuova Miniatura al Catalogo",
+            save: "Salva nel Catalogo",
+            allMacro: "Mostra Tutto",
+            allSub: "Tutti i Set",
+            faqHeader: "Domande Frequenti (FAQ)",
+            faqQ1: "Che tipo di resina utilizzi per le stampe fisiche?",
+            faqA1: "Utilizzo esclusivamente <strong>Anycubic V2 HD</strong> per garantire dettagli nitidissimi e superfici pronte alla pittura.",
+            faqQ2: "In che scala sono disponibili le miniature?",
+            faqA2: "I modelli standard sono in scala <strong>40mm</strong>. Su richiesta, quasi tutti possono essere realizzati a <strong>75mm</strong>.",
+            btnStore: "Vedi Store",
+            btnDelete: "❌ Elimina"
+        },
+        en: {
+            tagline: "Self-Managed Dynamic Catalog",
+            adminTitle: "🔒 Catalog Editor Active",
+            addItem: "＋ Add Item",
+            reset: "⚠️ Reset All",
+            formTitle: "Add New Miniature to Catalog",
+            save: "Save to Catalog",
+            allMacro: "Show All",
+            allSub: "All Sets",
+            faqHeader: "Frequently Asked Questions (FAQ)",
+            faqQ1: "What type of resin do you use for physical prints?",
+            faqA1: "I exclusively use <strong>Anycubic V2 HD</strong> to ensure razor-sharp details and smooth surfaces ready for painting.",
+            faqQ2: "What scale are the miniatures available in?",
+            faqA2: "Standard models are <strong>40mm</strong> scale. On request, almost all models can be printed in <strong>75mm</strong> scale.",
+            btnStore: "View Store",
+            btnDelete: "❌ Delete"
+        }
+    };
+
+    let products = JSON.parse(localStorage.getItem('l91_products')) || [
+        { id: 1, title: "Cyber-Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "https://via.placeholder.com/400x600?text=2D", img3D: "https://via.placeholder.com/400x600?text=3D", macro: "original", sub: "Cyber-Royalty", link: "#" },
+        { id: 2, title: "Squillo City: Team Russe", desc: "Set 1 di 5. 40mm", img2D: "https://via.placeholder.com/400x600?text=2D", img3D: "https://via.placeholder.com/400x600?text=3D", macro: "original", sub: "Squillo City", link: "#" }
+    ];
+
+    window.onload = function() {
+        renderCatalog();
+        setLanguage('it');
+    };
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.utility-bar .util-btn').forEach(b => b.classList.remove('active-lang'));
+        document.getElementById(`lang-${lang}`).classList.add('active-lang');
+
+        // Applica traduzioni statiche
+        document.getElementById('txt-tagline').innerText = translations[lang].tagline;
+        document.getElementById('txt-admin-title').innerText = translations[lang].adminTitle;
+        document.getElementById('txt-add-item-btn').innerText = translations[lang].addItem;
+        document.getElementById('txt-reset-btn').innerText = translations[lang].reset;
+        document.getElementById('txt-form-title').innerText = translations[lang].formTitle;
+        document.getElementById('txt-save-btn').innerText = translations[lang].save;
+        document.getElementById('macro-all').innerText = translations[lang].allMacro;
+        document.getElementById('txt-faq-header').innerText = translations[lang].faqHeader;
+        document.getElementById('txt-faq-q1').innerText = translations[lang].faqQ1;
+        document.getElementById('txt-faq-a1').innerHTML = translations[lang].faqA1;
+        document.getElementById('txt-faq-q2').innerText = translations[lang].faqQ2;
+        document.getElementById('txt-faq-a1_2').innerHTML = translations[lang].faqA2;
+
+        renderCatalog();
+    }
+
+    function unlockAdmin() {
+        const pass = prompt(currentLang === 'it' ? "Inserisci password:" : "Enter password:");
+        if(pass === securePassword) {
+            adminMode = true;
+            document.getElementById('adminBar').style.display = 'flex';
+            document.getElementById('edit-master-btn').style.display = 'none'; // Nasconde tasto edit dopo login
+            renderCatalog();
+        } else if (pass !== null) { alert("Accesso Negato / Denied."); }
+    }
+
+    function toggleAddForm() {
+        const form = document.getElementById('addForm');
+        form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function addNewProduct() {
+        const title = document.getElementById('formTitle').value;
+        const desc = document.getElementById('formDesc').value;
+        const img2D = document.getElementById('formImg2D').value || "https://via.placeholder.com/400x600?text=No+Img";
+        const img3D = document.getElementById('formImg3D').value || "https://via.placeholder.com/400x600?text=No+Img";
+        const sub = document.getElementById('formSubCat').value || "Generico";
+        const link = document.getElementById('formLink').value || "#";
+        const macro = document.getElementById('formMacro').value;
+
+        if(!title) { alert("Title Required"); return; }
+
+        const newProd = { id: Date.now(), title, desc, img2D, img3D, macro, sub, link };
+        products.push(newProd);
+        saveAndRefresh();
+        toggleAddForm();
+    }
+
+    function removeProduct(id) {
+        if(confirm(currentLang === 'it' ? "Eliminare questo articolo?" : "Delete this item?")) {
+            products = products.filter(p => p.id !== id);
+            saveAndRefresh();
+        }
+    }
+
+    function saveAndRefresh() {
+        localStorage.setItem('l91_products', JSON.stringify(products));
+        renderCatalog();
+    }
+
+    function clearCatalogData() {
+        if(confirm("Reset total catalog?")) {
+            localStorage.removeItem('l91_products');
+            location.reload();
+        }
+    }
+
+    function renderCatalog() {
+        const grid = document.getElementById('catalogGrid');
+        const subNav = document.getElementById('subCategoryContainer');
+        grid.innerHTML = "";
+        
+        let subCategories = new Set();
+        products.forEach(p => {
+            if(selectedMacro === 'all' || p.macro === selectedMacro) {
+                subCategories.add(p.sub);
+            }
+        });
+
+        let subHTML = `<button class="sub-btn ${selectedSub === 'all'?'active':''}" onclick="filterSub('all')">${translations[currentLang].allSub}</button>`;
+        subCategories.forEach(sub => {
+            subHTML += `<button class="sub-btn ${selectedSub === sub?'active':''}" onclick="filterSub('${sub}')">${sub}</button>`;
+        });
+        subNav.innerHTML = subHTML;
+
+        products.forEach(p => {
+            const matchesMacro = (selectedMacro === 'all' || p.macro === selectedMacro);
+            const matchesSub = (selectedSub === 'all' || p.sub === selectedSub);
+
+            if(matchesMacro && matchesSub) {
+                const card = document.createElement('div');
+                card.className = "comparison-card";
+                card.innerHTML = `
+                    <div class="image-box">
+                        <img src="${p.img2D}" alt="2D">
+                        <img src="${p.img3D}" alt="3D">
+                    </div>
+                    <div class="card-info">
+                        <span class="badge">${p.sub}</span>
+                        <h3>${p.title}</h3>
+                        <p>${p.desc}</p>
+                        <a href="${p.link}" target="_blank" class="btn-link">${translations[currentLang].btnStore}</a>
+                        ${adminMode ? `<button class="admin-btn" style="display:block; width:90%; margin: 10px auto 0;" onclick="removeProduct(${p.id})">${translations[currentLang].btnDelete}</button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(card);
+            }
+        });
+    }
+
+    function filterMacro(macro) {
+        selectedMacro = macro;
+        selectedSub = 'all';
+        document.querySelectorAll('.macro-nav .filter-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(`macro-${macro}`).classList.add('active');
+        renderCatalog();
+    }
+
+    function filterSub(sub) {
+        selectedSub = sub;
+        renderCatalog();
+    }
+</script>
+</body>
+</html>
