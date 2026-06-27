@@ -14,18 +14,23 @@
             --gray: #888;
         }
 
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Inter', -apple-system, sans-serif;
-            margin: 0;
             color: var(--text);
             line-height: 1.6;
             background-color: var(--dark);
-            /* Risolto il problema del loop visivo rimuovendo la texture ripetitiva */
             background-image: 
                 radial-gradient(at 10% 20%, rgba(155, 89, 182, 0.15) 0px, transparent 50%),
                 radial-gradient(at 90% 80%, rgba(0, 212, 255, 0.1) 0px, transparent 50%);
             background-attachment: fixed;
             background-size: cover;
+            background-repeat: no-repeat;
         }
 
         .utility-bar {
@@ -153,7 +158,7 @@
         .admin-mode-active .image-box img { cursor: pointer; }
         .admin-mode-active .image-box img:hover { opacity: 0.6; }
         .admin-mode-active .image-box::after {
-            content: "🤖 Click to Paste Drive Link";
+            content: "🤖 Click to change PNG filename";
             position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.85); color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; pointer-events: none;
             white-space: nowrap;
@@ -227,8 +232,8 @@
         <div class="form-grid">
             <input type="text" id="formTitle" placeholder="Titolo">
             <input type="text" id="formDesc" placeholder="Descrizione / Scala">
-            <input type="text" id="formImg2D" placeholder="Incolla Link Condivisione Google Drive 2D">
-            <input type="text" id="formImg3D" placeholder="Incolla Link Condivisione Google Drive 3D">
+            <input type="text" id="formImg2D" placeholder="Nome file immagine 2D (es. elsa_2d.png)">
+            <input type="text" id="formImg3D" placeholder="Nome file immagine 3D (es. elsa_3d.png)">
             
             <select id="formSubCat"></select>
 
@@ -270,6 +275,11 @@
 </footer>
 
 <script>
+    // CONFIGURAZIONE GITHUB - Inserisci qui i tuoi dati di GitHub
+    const githubUser = "IL_TUO_USERNAME_GITHUB"; 
+    const githubRepo = "IL_NOME_DEL_TUO_REPO";   
+    const githubBranch = "main";                  
+
     const securePassword = "laida2026"; 
     let adminMode = false;
     let selectedMacro = 'all';
@@ -327,7 +337,7 @@
     };
 
     let products = JSON.parse(localStorage.getItem('l91_products')) || [
-        { id: 1, title: "Cyber Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "", img3D: "", macro: "original", sub: "Cyber Royalty", link: "#" }
+        { id: 1, title: "Cyber Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "elsa_2d.png", img3D: "elsa_3d.png", macro: "original", sub: "Cyber Royalty", link: "#" }
     ];
 
     window.onload = function() {
@@ -335,15 +345,11 @@
         updateFormSubOptions();
     };
 
-    function cleanDriveUrl(url) {
-        if (!url) return "";
-        if (url.includes("drive.google.com")) {
-            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
-            if (match && match[1]) {
-                return `https://drive.google.com/uc?export=view&id=${match[1]}`;
-            }
-        }
-        return url;
+    // Converte il nome del file in un URL Raw di GitHub funzionante
+    function generateGithubUrl(filename) {
+        if (!filename) return "";
+        if (filename.startsWith("http://") || filename.startsWith("https://")) return filename;
+        return `https://raw.githubusercontent.com/${githubUser}/${githubRepo}/${githubBranch}/${filename}`;
     }
 
     function updateFormSubOptions() {
@@ -403,8 +409,8 @@
     function addNewProduct() {
         const title = document.getElementById('formTitle').value || "Nuovo Modello";
         const desc = document.getElementById('formDesc').value || "Scala 40mm";
-        const img2D = cleanDriveUrl(document.getElementById('formImg2D').value);
-        const img3D = cleanDriveUrl(document.getElementById('formImg3D').value);
+        const img2D = document.getElementById('formImg2D').value.trim();
+        const img3D = document.getElementById('formImg3D').value.trim();
         const sub = document.getElementById('formSubCat').value;
         const link = document.getElementById('formLink').value || "#";
         const macro = document.getElementById('formMacro').value;
@@ -419,9 +425,9 @@
         const index = products.findIndex(p => p.id === id);
         if(index === -1) return;
 
-        const newUrl = prompt("Incolla qui il link di condivisione di Google Drive per questa immagine:");
-        if(newUrl !== null) {
-            products[index][type] = cleanDriveUrl(newUrl.trim());
+        const newFilename = prompt("Inserisci SOLO il nome del file PNG caricato su GitHub (es: elsa_2d.png):", products[index][type]);
+        if(newFilename !== null) {
+            products[index][type] = newFilename.trim();
             saveToLocalStorage();
         }
     }
@@ -440,6 +446,8 @@
                 p.sub = card.querySelector('.edit-sub').value;
                 p.link = card.querySelector('.edit-link').value;
                 p.macro = card.querySelector('.edit-macro').value;
+                p.img2D = card.querySelector('.edit-img2d').value;
+                p.img3D = card.querySelector('.edit-img3d').value;
             }
         });
         saveToLocalStorage();
@@ -473,13 +481,13 @@
                 card.className = "comparison-card";
                 card.setAttribute('data-prod-id', p.id);
 
-                const src2D = p.img2D || "https://via.placeholder.com/400x600?text=Incolla+Link+Drive+2D";
-                const src3D = p.img3D || "https://via.placeholder.com/400x600?text=Incolla+Link+Drive+3D";
+                const src2D = generateGithubUrl(p.img2D) || "https://via.placeholder.com/400x600?text=Manca+File+PNG+2D";
+                const src3D = generateGithubUrl(p.img3D) || "https://via.placeholder.com/400x600?text=Manca+File+PNG+3D";
 
                 let cardInner = `
                     <div class="image-box">
-                        <img src="${src2D}" alt="2D" onclick="changeImage(${p.id}, 'img2D')" onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Link+Drive'">
-                        <img src="${src3D}" alt="3D" onclick="changeImage(${p.id}, 'img3D')" onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Link+Drive'">
+                        <img src="${src2D}" alt="2D" onclick="changeImage(${p.id}, 'img2D')" onerror="this.src='https://via.placeholder.com/400x600?text=File+Non+Trovato+su+GitHub'">
+                        <img src="${src3D}" alt="3D" onclick="changeImage(${p.id}, 'img3D')" onerror="this.src='https://via.placeholder.com/400x600?text=File+Non+Trovato+su+GitHub'">
                     </div>
                     <div class="card-info">
                 `;
@@ -495,6 +503,11 @@
                         <select class="edit-select edit-sub badge">${subOptionsHTML}</select>
                         <input type="text" class="edit-input edit-title" style="font-weight:bold; font-size:1.1rem;" value="${p.title}">
                         <input type="text" class="edit-input edit-desc" value="${p.desc}">
+                        
+                        <div style="font-size:0.75rem; color:var(--accent); text-align:left; margin-left:15px;">Nome File 2D / 3D:</div>
+                        <input type="text" class="edit-input edit-img2d" value="${p.img2D || ''}" placeholder="Nome file 2D (es. elsa_2d.png)">
+                        <input type="text" class="edit-input edit-img3d" value="${p.img3D || ''}" placeholder="Nome file 3D (es. elsa_3d.png)">
+                        
                         <input type="text" class="edit-input edit-link" value="${p.link}" placeholder="URL Store">
                         <select class="edit-select edit-macro" onchange="saveLiveEdits()">
                             <option value="original" ${p.macro === 'original' ? 'selected' : ''}>Original Concept</option>
