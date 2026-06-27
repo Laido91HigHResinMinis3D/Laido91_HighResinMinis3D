@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laida91_3D | Google Drive Gallery Catalog</title>
+    <title>High Resin Minis 3D | Catalog</title>
     <style>
         :root {
             --primary: #9b59b6; 
@@ -34,6 +34,445 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .util-btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .util-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .util-btn.active-lang { background: var(--primary); border-color: var(--primary); }
+
+        .admin-bar {
+            background: #222;
+            padding: 10px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .admin-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+        .admin-btn.green { background: #2ecc71; }
+        .admin-btn.blue { background: #3498db; }
+
+        header {
+            height: 38vh;
+            background: linear-gradient(to bottom, rgba(155, 89, 182, 0.25), rgba(15, 15, 15, 0.5));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+        }
+
+        h1 { font-size: 3rem; margin: 0; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 20px rgba(155, 89, 182, 0.5); }
+        .brand-sub { font-size: 1.1rem; color: #aaa; text-transform: none; letter-spacing: 1px; font-weight: 400; margin-top: 5px; }
+        .tagline { font-size: 1.3rem; color: var(--accent); font-weight: 300; margin-top: 10px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3); }
+        .description-text { font-size: 1rem; color: #ccc; margin-top: 15px; max-width: 800px; }
+        .header-links { margin-top: 20px; display: flex; gap: 15px; }
+
+        .header-link-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text);
+            border: 1px solid var(--primary);
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .header-link-btn:hover { background: var(--primary); box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+
+        .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
+
+        .macro-nav { text-align: center; margin-bottom: 20px; }
+        .sub-nav { text-align: center; margin-bottom: 40px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+        .filter-btn {
+            background: rgba(15, 15, 15, 0.6);
+            border: 2px solid var(--primary);
+            color: var(--text);
+            padding: 10px 25px;
+            margin: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); box-shadow: 0 0 15px rgba(155, 89, 182, 0.5); }
+        
+        .sub-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: #bbb;
+            padding: 6px 15px;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sub-btn:hover, .sub-btn.active { border-color: var(--accent); color: var(--accent); }
+
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .comparison-card { 
+            background: var(--card-bg); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            border: 1px solid #333; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .comparison-card:hover {
+            border-color: rgba(155, 89, 182, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .image-box { display: flex; background: #000; position: relative; }
+        .image-box img { width: 50%; object-fit: cover; height: 280px; border: 1px solid #111; transition: opacity 0.3s; }
+        
+        .admin-mode-active .image-box img { cursor: pointer; }
+        .admin-mode-active .image-box img:hover { opacity: 0.6; }
+        .admin-mode-active .image-box::after {
+            content: "🤖 Click to Paste Drive Link";
+            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; pointer-events: none;
+            white-space: nowrap;
+            border: 1px solid var(--accent);
+        }
+
+        .card-info { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .edit-input { background: #222; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 5px; width: 90%; margin: 5px auto; display: block; text-align: center; font-family: inherit; }
+        .edit-select { background: #222; border: 1px solid #444; color: var(--accent); padding: 5px; border-radius: 5px; margin: 5px auto; display: block; }
+
+        .badge { display: inline-block; background: #333; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; color: var(--accent); margin: 5px auto; }
+
+        .btn-link { display: inline-block; background: #fff; color: #000; padding: 8px 18px; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin: 3px; }
+        .btn-link:hover { background: var(--accent); box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
+
+        .admin-form-container {
+            background: rgba(21, 21, 21, 0.95);
+            border: 1px solid var(--accent);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .admin-form-container h3 { margin-top: 0; color: var(--accent); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-grid input, .form-grid select { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; }
+
+        .faq-container { background: rgba(17, 17, 17, 0.85); padding: 40px; border-radius: 15px; margin-top: 60px; backdrop-filter: blur(10px); border: 1px solid #222; }
+        .faq-item { margin-bottom: 25px; border-left: 3px solid var(--primary); padding-left: 20px; }
+        .faq-item h3 { margin: 0 0 10px 0; color: var(--accent); }
+
+        footer { text-align: center; padding: 40px; background: #050505; border-top: 1px solid #222; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+<div class="utility-bar">
+    <button class="util-btn active-lang" id="lang-it" onclick="setLanguage('it')">🇮🇹 IT</button>
+    <button class="util-btn" id="lang-en" onclick="setLanguage('en')">🇬🇧 EN</button>
+    <button class="util-btn" id="edit-master-btn" onclick="unlockAdmin()">⚙️ Edit</button>
+</div>
+
+<div class="admin-bar" id="adminBar">
+    <span id="txt-admin-title">🔒 Editor Catalogo Attivo</span>
+    <div>
+        <button class="admin-btn green" id="txt-add-item-btn" onclick="toggleAddForm()">＋ Quick Add</button>
+        <button class="admin-btn blue" onclick="saveLiveEdits()">💾 Salva Modifiche / Save</button>
+        <button class="admin-btn" id="txt-reset-btn" onclick="clearCatalogData()">⚠️ Reset</button>
+    </div>
+</div>
+
+<header>
+    <h1>High Resin Minis 3D</h1>
+    <div class="brand-sub">A laida91 Concept</div>
+    <p class="tagline" id="txt-tagline">Catalogo Dinamico Autogestito</p>
+    <p class="description-text">Esplora la mia collezione di miniature 3D personalizzate e progetti esclusivi. Trova il modello perfetto per la tua stampa!</p>
+    <div class="header-links">
+        <a href="https://instagram.com/iltuonome" target="_blank" class="header-link-btn">Scrivimi su Instagram</a>
+        <a href="https://vinted.it/iltuonome" target="_blank" class="header-link-btn">Visita il mio Vinted</a>
+    </div>
+</header>
+
+<div class="container">
+
+    <div class="admin-form-container" id="addForm">
+        <h3 id="txt-form-title">Aggiungi Nuova Miniatura</h3>
+        <div class="form-grid">
+            <input type="text" id="formTitle" placeholder="Titolo">
+            <input type="text" id="formDesc" placeholder="Descrizione / Scala">
+            <input type="text" id="formImg2D" placeholder="Incolla Link Condivisione Google Drive 2D">
+            <input type="text" id="formImg3D" placeholder="Incolla Link Condivisione Google Drive 3D">
+            
+            <select id="formSubCat">
+                </select>
+
+            <input type="text" id="formLink" placeholder="Link Store (Vinted/Cults)">
+            <select id="formMacro" onchange="updateFormSubOptions()">
+                <option value="original">Original Concept</option>
+                <option value="various">Various Artists</option>
+            </select>
+        </div>
+        <button class="admin-btn green" id="txt-save-btn" onclick="addNewProduct()">Aggiungi</button>
+    </div>
+    
+    <div class="macro-nav">
+        <button class="filter-btn active" id="macro-all" onclick="filterMacro('all')">Mostra Tutto</button>
+        <button class="filter-btn" id="macro-original" onclick="filterMacro('original')">Original Concept</button>
+        <button class="filter-btn" id="macro-various" onclick="filterMacro('various')">Various Artists</button>
+    </div>
+
+    <div class="sub-nav" id="subCategoryContainer"></div>
+    <div class="portfolio-grid" id="catalogGrid" style="margin-top: 20px;"></div>
+
+    <section class="faq-container">
+        <center><h2 id="txt-faq-header">Domande Frequenti (FAQ)</h2></center>
+        <div class="faq-item">
+            <h3 id="txt-faq-q1">Che tipo di resina utilizzi per le stampe fisiche?</h3>
+            <p id="txt-faq-a1">Utilizzo esclusivamente <strong>Anycubic V2 HD</strong> per dettagli nitidissimi.</p>
+        </div>
+        <div class="faq-item">
+            <h3 id="txt-faq-q2">In che scala sono disponibili le miniature?</h3>
+            <p id="txt-faq-a1_2">I modelli standard sono in scala <strong>40mm</strong>. Su richiesta, fino a <strong>75mm</strong>.</p>
+        </div>
+    </section>
+</div>
+
+<footer>
+    <p>Tutto ciò che è pronto alla vendita è disponibile qui sul sito. Per richieste speciali o personalizzazioni, scrivimi su Instagram.</p>
+    <p>&copy; 2026 High Resin Minis 3D</p>
+</footer>
+
+<script>
+    const securePassword = "laida2026"; 
+    let adminMode = false;
+    let selectedMacro = 'all';
+    let selectedSub = 'all';
+    let currentLang = 'it';
+
+    // Mappatura fissa dei sottogruppi richiesti per macro-categoria
+    const subCategoriesMap = {
+        various: ["ABE3D", "E.s Monster", "DIGITAL DARK pin-up s", "Yan-H", "Azaak3D"],
+        original: ["Cyber Royalty", "Slutty Pin-Up", "Wizard and Sword"]
+    };
+
+    const translations = {
+        it: { tagline: "Catalogo Dinamico Autogestito", adminTitle: "🔒 Editor Catalogo Attivo", addItem: "＋ Quick Add", reset: "⚠️ Reset", formTitle: "Aggiungi Nuova Miniatura", save: "Aggiungi", allMacro: "Mostra Tutto", allSub: "Tutti i Sottogruppi", faqHeader: "Domande Frequenti (FAQ)", btnStore: "Vedi Store" },
+        en: { tagline: "Self-Managed Dynamic Catalog", adminTitle: "🔒 Catalog Editor Active", addItem: "＋ Quick Add", reset: "⚠️ Reset", formTitle: "Add New Miniature", save: "Add", allMacro: "Show All", allSub: "All Subgroups", faqHeader: "Frequently Questions (FAQ)", btnStore: "View Store" }
+    };
+
+    let products = JSON.parse(localStorage.getItem('l91_products')) || [
+        { id: 1, title: "Cyber-Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "", img3D: "", macro: "original", sub: "Cyber Royalty", link: "#" }
+    ];
+
+    window.onload = function() {
+        setLanguage('it');
+        updateFormSubOptions();
+    };
+
+    function cleanDriveUrl(url) {
+        if (!url) return "";
+        if (url.includes("drive.google.com")) {
+            const match = url.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (match && match[1]) {
+                return `https://lh3.googleusercontent.com/d/$=${match[1]}`;
+            }
+        }
+        return url;
+    }
+
+    // Aggiorna i campi di selezione dei sottogruppi nel modulo di aggiunta a seconda della macro scelta
+    function updateFormSubOptions() {
+        const macro = document.getElementById('formMacro').value;
+        const subSelect = document.getElementById('formSubCat');
+        subSelect.innerHTML = "";
+        subCategoriesMap[macro].forEach(sub => {
+            let opt = document.createElement('option');
+            opt.value = sub;
+            opt.innerText = sub;
+            subSelect.appendChild(opt);
+        });
+    }
+
+    function setLanguage(lang) {
+        currentLang = lang;
+        document.querySelectorAll('.utility-bar .util-btn').forEach(b => b.classList.remove('active-lang'));
+        document.getElementById(`lang-${lang}`).classList.add('active-lang');
+        document.getElementById('txt-tagline').innerText = translations[lang].tagline;
+        document.getElementById('txt-admin-title').innerText = translations[lang].adminTitle;
+        document.getElementById('txt-add-item-btn').innerText = translations[lang].addItem;
+        document.getElementById('txt-reset-btn').innerText = translations[lang].reset;
+        document.getElementById('txt-form-title').innerText = translations[lang].formTitle;
+        document.getElementById('txt-save-btn').innerText = translations[lang].save;
+        document.getElementById('macro-all').innerText = translations[lang].allMacro;
+        document.getElementById('txt-faq-header').innerText = translations[lang].faqHeader;
+        renderCatalog();
+    }
+
+    function unlockAdmin() {
+        const pass = prompt("Password:");
+        if(pass === securePassword) {
+            adminMode = true;
+            document.body.classList.add('admin-mode-active');
+            document.getElementById('adminBar').style.display = 'flex';
+            document.getElementById('edit-master-btn').style.display = 'none';
+            renderCatalog();
+        }
+    }
+
+    function toggleAddForm() {
+        const form = document.getElementById('addForm');
+        form.style.display = (form.style.display === 'block') ? 'none' : 'block';
+    }
+
+    function addNewProduct() {
+        const title = document.getElementById('formTitle').value || "Nuovo Modello";
+        const desc = document.getElementById('formDesc').value || "Scala 40mm";
+        const img2D = cleanDriveUrl(document.getElementById('formImg2D').value);
+        const img3D = cleanDriveUrl(document.getElementById('formImg3D').value);
+        const sub = document.getElementById('formSubCat').value;
+        const link = document.getElementById('formLink').value || "#";
+        const macro = document.getElementById('formMacro').value;
+
+        products.push({ id: Date.now(), title, desc, img2D, img3D, macro, sub, link });
+        saveToLocalStorage();
+        toggleAddForm();
+    }
+
+    function changeImage(id, type) {
+        if(!adminMode) return;
+        const index = products.findIndex(p => p.id === id);
+        if(index === -1) return;
+
+        const newUrl = prompt("Incolla qui il link di condivisione di Google Drive per questa immagine:");
+        if(newUrl !== null) {
+            products[index][type] = cleanDriveUrl(newUrl.trim());
+            saveToLocalStorage();
+        }
+    }
+
+    function removeProduct(id) {
+        if(confirm("Eliminare?")) { products = products.filter(p => p.id !== id); saveToLocalStorage(); }
+    }
+
+    function saveLiveEdits() {
+        if(!adminMode) return;
+        products.forEach(p => {
+            const card = document.querySelector(`[data-prod-id="${p.id}"]`);
+            if(card) {
+                p.title = card.querySelector('.edit-title').value;
+                p.desc = card.querySelector('.edit-desc').value;
+                p.sub = card.querySelector('.edit-sub').value;
+                p.link = card.querySelector('.edit-link').value;
+                p.macro = card.querySelector('.edit-macro').value;
+            }
+        });
+        saveToLocalStorage();
+        alert("Modifiche salvate con successo! / Changes Saved!");
+    }
+
+    function saveToLocalStorage() { localStorage.setItem('l91_products', JSON.stringify(products)); renderCatalog(); }
+    function clearCatalogData() { if(confirm("Reset?")) { localStorage.removeItem('l91_products'); location.reload(); } }
+
+    function renderCatalog() {
+        const grid = document.getElementById('catalogGrid');
+        const subNav = document.getElementById('subCategoryContainer');
+        grid.innerHTML = "";
+        
+        // Mostra i filtri dei Sottogruppi solo per la macro-categoria attiva
+        let allowedSubs = [];
+        if(selectedMacro === 'all') {
+            allowedSubs = [...subCategoriesMap.various, ...subCategoriesMap.original];
+        } else {
+            allowedSubs = subCategoriesMap[selectedMacro];
+        }
+
+        let subHTML = `<button class="sub-btn ${selectedSub === 'all'?'active':''}" onclick="filterSub('all')">${translations[currentLang].allSub}</button>`;
+        allowedSubs.forEach(sub => { 
+            subHTML += `<button class="sub-btn ${selectedSub === sub?'active':''}" onclick="filterSub('${sub}')">${sub}</button>`; 
+        });
+        subNav.innerHTML = subHTML;
+
+        products.forEach(p => {
+            if((selectedMacro === 'all' || p.macro === selectedMacro) && (selectedSub === 'all' || p.sub === selectedSub)) {
+                const card = document.createElement('div');
+                card.className = "comparison-card";
+                card.setAttribute('data-prod-id', p.id);
+
+                const src2D = p.img2D || "https://via.placeholder.com/400x600?text=Incolla+Link+Drive+2D";
+                const src3D = p.img3D || "https://via.placeholder.com/400x600?text=Incolla+Link+Drive+3D";
+
+                let cardInner = `
+                    <div class="image-box">
+                        <img src="${src2D}" alt="2D" onclick="changeImage(${p.id}, 'img2D')" onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Link+Drive'">
+                        <img src="${src3D}" alt="3D" onclick="changeImage(${p.id}, 'img3D')" onerror="this.src='https://via.placeholder.com/400x600?text=Errore+Link+Drive'">
+                    </div>
+                    <div class="card-info">
+                `;
+
+                if(adminMode) {
+                    // Genera dinamicamente le opzioni del sottogruppo corretto anche in fase di modifica rapida della scheda
+                    let currentMacroMap = subCategoriesMap[p.macro] || [];
+                    let subOptionsHTML = "";
+                    currentMacroMap.forEach(s => {
+                        subOptionsHTML += `<option value="${s}" ${p.sub === s ? 'selected' : ''}>${s}</option>`;
+                    });
+
+                    cardInner += `
+                        <select class="edit-select edit-sub badge">${subOptionsHTML}</select>
+                        <input type="text" class="edit-input edit-title" style="font-weight:bold; font-size:1.1rem;" value="${p.title}">
+                        <input type="text" class="edit-input edit-desc" value="${p.desc}">
+                        <input type="text" class="edit-input edit-link" value="${p.link}" placeholder="URL Store">
+                        <select class="edit-select edit-macro" onchange="saveLiveEdits()">
+                            <option value="original" ${p.macro === 'original' ? 'selected' : ''}>Original Concept</option>
+                            <option value="various" ${p.macro === 'various' ? 'selected' : ''}>Various Artists</option>
+                        </select>
+                        <button class="admin-btn" style="width:100%; margin-top:10px;" onclick="removeProduct(${p.id})">❌ Elimina</button>
+                    `;
+                } else {
+                    cardInner += `
+                        <div><span class="badge">${p.sub}</span></div>
+                        <h3>${p.title}</h3>
+                        <p>${p.desc}</p>
+                        <a href="${p.link}" target="_blank" class="btn-link">${translations[currentLang].btnStore}</a>
+                    `;
+                }
+
+                cardInner += `</div>`;
+                card.innerHTML = cardInner;
+                grid.appendChild(card);
+            }
+        });
+    }
+
+    function filterMacro(macro) { selectedMacro = macro; selectedSub = 'all'; document.querySelectorAll('.macro-nav .filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(`macro-${macro}`).classList.add('active'); renderCatalog(); }
+    function filterSub(sub) { selectedSub = sub; renderCatalog(); }
+</script>
+</body>
+</html>
             border-bottom: 1px solid #222;
         }
 
