@@ -20,12 +20,12 @@
             color: var(--text);
             line-height: 1.6;
             background-color: var(--dark);
+            /* Risolto il problema del loop visivo rimuovendo la texture ripetitiva */
             background-image: 
                 radial-gradient(at 10% 20%, rgba(155, 89, 182, 0.15) 0px, transparent 50%),
-                radial-gradient(at 90% 80%, rgba(0, 212, 255, 0.1) 0px, transparent 50%),
-                linear-gradient(rgba(15, 15, 15, 0.95), rgba(15, 15, 15, 0.95)),
-                url('https://www.transparenttextures.com/patterns/carbon-fibre.png');
+                radial-gradient(at 90% 80%, rgba(0, 212, 255, 0.1) 0px, transparent 50%);
             background-attachment: fixed;
+            background-size: cover;
         }
 
         .utility-bar {
@@ -34,6 +34,193 @@
             display: flex;
             justify-content: flex-end;
             gap: 10px;
+            border-bottom: 1px solid #222;
+        }
+
+        .util-btn {
+            background: #222;
+            color: #fff;
+            border: 1px solid #444;
+            padding: 6px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+            transition: 0.3s;
+        }
+        .util-btn:hover { border-color: var(--accent); color: var(--accent); }
+        .util-btn.active-lang { background: var(--primary); border-color: var(--primary); }
+
+        .admin-bar {
+            background: #222;
+            padding: 10px 20px;
+            text-align: center;
+            border-bottom: 2px solid var(--accent);
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+        .admin-btn { background: #e74c3c; color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+        .admin-btn.green { background: #2ecc71; }
+        .admin-btn.blue { background: #3498db; }
+
+        header {
+            min-height: 38vh;
+            background: linear-gradient(to bottom, rgba(155, 89, 182, 0.25), rgba(15, 15, 15, 0.5));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 30px 20px;
+            border-bottom: 1px solid rgba(155, 89, 182, 0.2);
+            box-sizing: border-box;
+        }
+
+        h1 { font-size: 3rem; margin: 0; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 20px rgba(155, 89, 182, 0.5); }
+        .brand-sub { font-size: 1.1rem; color: #aaa; text-transform: none; letter-spacing: 1px; font-weight: 400; margin-top: 5px; }
+        .tagline { font-size: 1.3rem; color: var(--accent); font-weight: 300; margin-top: 10px; text-shadow: 0 0 10px rgba(0, 212, 255, 0.3); }
+        .description-text { font-size: 1rem; color: #ccc; margin-top: 15px; max-width: 800px; line-height: 1.5; }
+        .header-links { margin-top: 20px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; }
+
+        .header-link-btn {
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--text);
+            border: 1px solid var(--primary);
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .header-link-btn:hover { background: var(--primary); box-shadow: 0 0 10px rgba(155, 89, 182, 0.5); }
+
+        .container { max-width: 1200px; margin: auto; padding: 40px 20px; }
+
+        .macro-nav { text-align: center; margin-bottom: 20px; }
+        .sub-nav { text-align: center; margin-bottom: 40px; display: flex; justify-content: center; flex-wrap: wrap; gap: 10px; }
+
+        .filter-btn {
+            background: rgba(15, 15, 15, 0.6);
+            border: 2px solid var(--primary);
+            color: var(--text);
+            padding: 10px 25px;
+            margin: 5px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s;
+            backdrop-filter: blur(5px);
+        }
+        .filter-btn:hover, .filter-btn.active { background: var(--primary); box-shadow: 0 0 15px rgba(155, 89, 182, 0.5); }
+        
+        .sub-btn {
+            background: #222;
+            border: 1px solid #444;
+            color: #bbb;
+            padding: 6px 15px;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .sub-btn:hover, .sub-btn.active { border-color: var(--accent); color: var(--accent); }
+
+        .portfolio-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 30px; }
+        .comparison-card { 
+            background: var(--card-bg); 
+            border-radius: 15px; 
+            overflow: hidden; 
+            border: 1px solid #333; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: transform 0.3s, border-color 0.3s;
+        }
+        .comparison-card:hover {
+            border-color: rgba(155, 89, 182, 0.5);
+            transform: translateY(-5px);
+        }
+
+        .image-box { display: flex; background: #000; position: relative; }
+        .image-box img { width: 50%; object-fit: cover; height: 280px; border: 1px solid #111; transition: opacity 0.3s; }
+        
+        .admin-mode-active .image-box img { cursor: pointer; }
+        .admin-mode-active .image-box img:hover { opacity: 0.6; }
+        .admin-mode-active .image-box::after {
+            content: "🤖 Click to Paste Drive Link";
+            position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
+            background: rgba(0,0,0,0.85); color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; pointer-events: none;
+            white-space: nowrap;
+            border: 1px solid var(--accent);
+        }
+
+        .card-info { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .edit-input { background: #222; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 5px; width: 90%; margin: 5px auto; display: block; text-align: center; font-family: inherit; }
+        .edit-select { background: #222; border: 1px solid #444; color: var(--accent); padding: 5px; border-radius: 5px; margin: 5px auto; display: block; }
+
+        .badge { display: inline-block; background: #333; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; color: var(--accent); margin: 5px auto; }
+
+        .btn-link { display: inline-block; background: #fff; color: #000; padding: 8px 18px; text-decoration: none; border-radius: 20px; font-weight: bold; font-size: 0.85rem; margin: 3px; }
+        .btn-link:hover { background: var(--accent); box-shadow: 0 0 10px rgba(0, 212, 255, 0.5); }
+
+        .admin-form-container {
+            background: rgba(21, 21, 21, 0.95);
+            border: 1px solid var(--accent);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            display: none;
+            backdrop-filter: blur(10px);
+        }
+        .admin-form-container h3 { margin-top: 0; color: var(--accent); }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .form-grid input, .form-grid select { background: #222; border: 1px solid #444; color: #fff; padding: 10px; border-radius: 5px; }
+
+        .faq-container { background: rgba(17, 17, 17, 0.85); padding: 40px; border-radius: 15px; margin-top: 60px; backdrop-filter: blur(10px); border: 1px solid #222; }
+        .faq-item { margin-bottom: 25px; border-left: 3px solid var(--primary); padding-left: 20px; }
+        .faq-item h3 { margin: 0 0 10px 0; color: var(--accent); }
+
+        .footer-news { font-weight: bold; color: var(--accent); font-size: 1.1rem; margin-top: 15px; letter-spacing: 1px; }
+
+        footer { text-align: center; padding: 40px; background: #050505; border-top: 1px solid #222; margin-top: 60px; color: #aaa; }
+    </style>
+</head>
+<body>
+
+<div class="utility-bar">
+    <button class="util-btn active-lang" id="lang-it" onclick="setLanguage('it')">🇮🇹 IT</button>
+    <button class="util-btn" id="lang-en" onclick="setLanguage('en')">🇬🇧 EN</button>
+    <button class="util-btn" id="edit-master-btn" onclick="unlockAdmin()">⚙️ Edit</button>
+</div>
+
+<div class="admin-bar" id="adminBar">
+    <span id="txt-admin-title">🔒 Editor Catalogo Attivo</span>
+    <div>
+        <button class="admin-btn green" id="txt-add-item-btn" onclick="toggleAddForm()">＋ Quick Add</button>
+        <button class="admin-btn blue" onclick="saveLiveEdits()">💾 Salva Modifiche / Save</button>
+        <button class="admin-btn" id="txt-reset-btn" onclick="clearCatalogData()">⚠️ Reset</button>
+    </div>
+</div>
+
+<header>
+    <h1>High Resin Minis 3D</h1>
+    <div class="brand-sub">A laida91 Concept</div>
+    <p class="tagline" id="txt-tagline">Catalogo Dinamico Autogestito</p>
+    <p class="description-text" id="txt-description">Esplora la mia collezione di miniature 3D personalizzate e progetti esclusivi. Per qualsiasi personalizzazione e/o richiesta specifica puoi usare il link di Instagram e mandarmi un DM. Per vedere quali miniature sono invece già "pronte e stampate", puoi consultare direttamente il mio catalogo Vinted.</p>
+    <div class="header-links">
+        <a href="https://www.instagram.com/laidos91?igsh=MXB3M29wcTd2aXRlYg==" target="_blank" class="header-link-btn" id="btn-insta">Scrivimi su Instagram</a>
+        <a href="https://www.vinted.it/member/3161677749-highresinminis3d" target="_blank" class="header-link-btn" id="btn-vinted">Visita il mio Vinted</a>
+    </div>
+</header>
+
+<div class="container">
             border-bottom: 1px solid #222;
         }
 
