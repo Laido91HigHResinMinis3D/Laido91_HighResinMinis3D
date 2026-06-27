@@ -158,7 +158,7 @@
         .admin-mode-active .image-box img { cursor: pointer; }
         .admin-mode-active .image-box img:hover { opacity: 0.6; }
         .admin-mode-active .image-box::after {
-            content: "🤖 Click to change PNG filename";
+            content: "🤖 Click to change Image filename";
             position: absolute; bottom: 5px; left: 50%; transform: translateX(-50%);
             background: rgba(0,0,0,0.85); color: #fff; font-size: 0.75rem; padding: 4px 10px; border-radius: 10px; pointer-events: none;
             white-space: nowrap;
@@ -232,8 +232,8 @@
         <div class="form-grid">
             <input type="text" id="formTitle" placeholder="Titolo">
             <input type="text" id="formDesc" placeholder="Descrizione / Scala">
-            <input type="text" id="formImg2D" placeholder="Nome file immagine 2D (es. elsa_2d.png)">
-            <input type="text" id="formImg3D" placeholder="Nome file immagine 3D (es. elsa_3d.png)">
+            <input type="text" id="formImg2D" placeholder="Nome file o cartella/file (es. elsa_2d o elsa_2d.jpg)">
+            <input type="text" id="formImg3D" placeholder="Nome file o cartella/file (es. elsa_3d o elsa_3d.jpg)">
             
             <select id="formSubCat"></select>
 
@@ -275,7 +275,7 @@
 </footer>
 
 <script>
-    // CONFIGURAZIONE GITHUB - Inserisci qui i tuoi dati di GitHub
+    // CONFIGURAZIONE GITHUB - Ricorda che il tuo repo su GitHub deve essere PUBBLICO
     const githubUser = "IL_TUO_USERNAME_GITHUB"; 
     const githubRepo = "IL_NOME_DEL_TUO_REPO";   
     const githubBranch = "main";                  
@@ -337,7 +337,7 @@
     };
 
     let products = JSON.parse(localStorage.getItem('l91_products')) || [
-        { id: 1, title: "Cyber Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "elsa_2d.png", img3D: "elsa_3d.png", macro: "original", sub: "Cyber Royalty", link: "#" }
+        { id: 1, title: "Cyber Royalty: Elsa", desc: "Resina Anycubic V2 HD", img2D: "elsa_2d.jpg", img3D: "elsa_3d.jpg", macro: "original", sub: "Cyber Royalty", link: "#" }
     ];
 
     window.onload = function() {
@@ -345,10 +345,18 @@
         updateFormSubOptions();
     };
 
-    // Converte il nome del file in un URL Raw di GitHub funzionante
+    // Converte il nome del file in un URL Raw di GitHub supportando automaticamente JPG e varianti
     function generateGithubUrl(filename) {
         if (!filename) return "";
+        filename = filename.trim();
+        
         if (filename.startsWith("http://") || filename.startsWith("https://")) return filename;
+        
+        // Se l'utente non digita l'estensione (es. .jpg o .png), lo script mette .jpg di default
+        if (!filename.includes(".")) {
+            filename += ".jpg";
+        }
+        
         return `https://raw.githubusercontent.com/${githubUser}/${githubRepo}/${githubBranch}/${filename}`;
     }
 
@@ -425,7 +433,7 @@
         const index = products.findIndex(p => p.id === id);
         if(index === -1) return;
 
-        const newFilename = prompt("Inserisci SOLO il nome del file PNG caricato su GitHub (es: elsa_2d.png):", products[index][type]);
+        const newFilename = prompt("Inserisci il nome del file caricato su GitHub (Es: elsa_2d.jpg o lasciando vuoto aggiunge .jpg):", products[index][type]);
         if(newFilename !== null) {
             products[index][type] = newFilename.trim();
             saveToLocalStorage();
@@ -481,8 +489,8 @@
                 card.className = "comparison-card";
                 card.setAttribute('data-prod-id', p.id);
 
-                const src2D = generateGithubUrl(p.img2D) || "https://via.placeholder.com/400x600?text=Manca+File+PNG+2D";
-                const src3D = generateGithubUrl(p.img3D) || "https://via.placeholder.com/400x600?text=Manca+File+PNG+3D";
+                const src2D = generateGithubUrl(p.img2D) || "https://via.placeholder.com/400x600?text=Manca+File+Immagine+2D";
+                const src3D = generateGithubUrl(p.img3D) || "https://via.placeholder.com/400x600?text=Manca+File+Immagine+3D";
 
                 let cardInner = `
                     <div class="image-box">
@@ -504,9 +512,9 @@
                         <input type="text" class="edit-input edit-title" style="font-weight:bold; font-size:1.1rem;" value="${p.title}">
                         <input type="text" class="edit-input edit-desc" value="${p.desc}">
                         
-                        <div style="font-size:0.75rem; color:var(--accent); text-align:left; margin-left:15px;">Nome File 2D / 3D:</div>
-                        <input type="text" class="edit-input edit-img2d" value="${p.img2D || ''}" placeholder="Nome file 2D (es. elsa_2d.png)">
-                        <input type="text" class="edit-input edit-img3d" value="${p.img3D || ''}" placeholder="Nome file 3D (es. elsa_3d.png)">
+                        <div style="font-size:0.75rem; color:var(--accent); text-align:left; margin-left:15px;">Nome File 2D / 3D (.jpg di default):</div>
+                        <input type="text" class="edit-input edit-img2d" value="${p.img2D || ''}" placeholder="Nome file 2D (es. elsa_2d.jpg)">
+                        <input type="text" class="edit-input edit-img3d" value="${p.img3D || ''}" placeholder="Nome file 3D (es. elsa_3d.jpg)">
                         
                         <input type="text" class="edit-input edit-link" value="${p.link}" placeholder="URL Store">
                         <select class="edit-select edit-macro" onchange="saveLiveEdits()">
