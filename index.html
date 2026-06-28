@@ -168,7 +168,7 @@
         .card-info { padding: 20px; text-align: center; flex-grow: 1; display: flex; flex-direction: column; justify-content: space-between; }
         
         .edit-input { background: #222; border: 1px solid #444; color: #fff; padding: 5px; border-radius: 5px; width: 90%; margin: 5px auto; display: block; text-align: center; font-family: inherit; }
-        .edit-select { background: #222; border: 1px solid #444; color: var(--accent); padding: 5px; border-radius: 5px; margin: 5px auto; display: block; }
+        .edit-select { background: #222; border: 1px solid #444; color: var(--accent); padding: 5px; border-radius: 5px; margin: 5px auto; display: block; width: 90%; text-align: center; }
 
         .badge { display: inline-block; background: #333; padding: 2px 10px; border-radius: 10px; font-size: 0.75rem; color: var(--accent); margin: 5px auto; }
 
@@ -232,8 +232,8 @@
         <div class="form-grid">
             <input type="text" id="formTitle" placeholder="Titolo">
             <input type="text" id="formDesc" placeholder="Descrizione / Scala">
-            <input type="text" id="formImg2D" placeholder="Nome file o cartella/file (es. elsa_2d o elsa_2d.jpg)">
-            <input type="text" id="formImg3D" placeholder="Nome file o cartella/file (es. elsa_3d o elsa_3d.jpg)">
+            <input type="text" id="formImg2D" placeholder="Nome file 2D (es. elsa_2d.jpg)">
+            <input type="text" id="formImg3D" placeholder="Nome file 3D (es. elsa_3d.jpg)">
             
             <select id="formSubCat"></select>
 
@@ -275,10 +275,10 @@
 </footer>
 
 <script>
-    // CONFIGURAZIONE GITHUB - Ricorda che il tuo repo su GitHub deve essere PUBBLICO
-    const githubUser = Laido91; 
-    const githubRepo = Laido91_HighResinMinis3D;   
-    const githubBranch = main;                  
+    // COORDINATE REALI GITHUB AGGIORNATE
+    const githubUser = "Laido91HighResinMinis3D"; 
+    const githubRepo = "Laido91_HighResinMinis3D";   
+    const githubBranch = "main";                  
 
     const securePassword = "laida2026"; 
     let adminMode = false;
@@ -345,14 +345,14 @@
         updateFormSubOptions();
     };
 
-    // Converte il nome del file in un URL Raw di GitHub supportando automaticamente JPG e varianti
+    // Converte il nome del file in un URL Raw di GitHub supportando automaticamente JPG/PNG e varianti
     function generateGithubUrl(filename) {
         if (!filename) return "";
         filename = filename.trim();
         
         if (filename.startsWith("http://") || filename.startsWith("https://")) return filename;
         
-        // Se l'utente non digita l'estensione (es. .jpg o .png), lo script mette .jpg di default
+        // Correzione automatica estensione: se manca il punto, forza .jpg
         if (!filename.includes(".")) {
             filename += ".jpg";
         }
@@ -426,6 +426,13 @@
         products.push({ id: Date.now(), title, desc, img2D, img3D, macro, sub, link });
         saveToLocalStorage();
         toggleAddForm();
+        
+        // Reset form fields
+        document.getElementById('formTitle').value = "";
+        document.getElementById('formDesc').value = "";
+        document.getElementById('formImg2D').value = "";
+        document.getElementById('formImg3D').value = "";
+        document.getElementById('formLink').value = "";
     }
 
     function changeImage(id, type) {
@@ -433,7 +440,7 @@
         const index = products.findIndex(p => p.id === id);
         if(index === -1) return;
 
-        const newFilename = prompt("Inserisci il nome del file caricato su GitHub (Es: elsa_2d.jpg o lasciando vuoto aggiunge .jpg):", products[index][type]);
+        const newFilename = prompt("Inserisci il nome del file su GitHub (Es: elsa_2d.jpg):", products[index][type]);
         if(newFilename !== null) {
             products[index][type] = newFilename.trim();
             saveToLocalStorage();
@@ -441,7 +448,25 @@
     }
 
     function removeProduct(id) {
-        if(confirm("Eliminare?")) { products = products.filter(p => p.id !== id); saveToLocalStorage(); }
+        if(confirm("Sei sicuro di voler eliminare definitivamente questa inserzione?")) { 
+            products = products.filter(p => p.id !== id); 
+            saveToLocalStorage(); 
+        }
+    }
+
+    function updateCardSubOptions(id, macroValue) {
+        const card = document.querySelector(`[data-prod-id="${id}"]`);
+        if(!card) return;
+        const subSelect = card.querySelector('.edit-sub');
+        if(!subSelect) return;
+        
+        subSelect.innerHTML = "";
+        subCategoriesMap[macroValue].forEach(s => {
+            let opt = document.createElement('option');
+            opt.value = s;
+            opt.innerText = s;
+            subSelect.appendChild(opt);
+        });
     }
 
     function saveLiveEdits() {
@@ -459,11 +484,20 @@
             }
         });
         saveToLocalStorage();
-        alert("Modifiche salvate con successo! / Changes Saved!");
+        alert("Tutte le modifiche sono state salvate nel browser! / Changes Saved!");
     }
 
-    function saveToLocalStorage() { localStorage.setItem('l91_products', JSON.stringify(products)); renderCatalog(); }
-    function clearCatalogData() { if(confirm("Reset?")) { localStorage.removeItem('l91_products'); location.reload(); } }
+    function saveToLocalStorage() { 
+        localStorage.setItem('l91_products', JSON.stringify(products)); 
+        renderCatalog(); 
+    }
+    
+    function clearCatalogData() { 
+        if(confirm("Attenzione! Questo cancellerà TUTTI i dati inseriti tornando al modello iniziale. Procedere?")) { 
+            localStorage.removeItem('l91_products'); 
+            location.reload(); 
+        } 
+    }
 
     function renderCatalog() {
         const grid = document.getElementById('catalogGrid');
@@ -489,8 +523,8 @@
                 card.className = "comparison-card";
                 card.setAttribute('data-prod-id', p.id);
 
-                const src2D = generateGithubUrl(p.img2D) || "https://via.placeholder.com/400x600?text=Manca+File+Immagine+2D";
-                const src3D = generateGithubUrl(p.img3D) || "https://via.placeholder.com/400x600?text=Manca+File+Immagine+3D";
+                const src2D = generateGithubUrl(p.img2D) || "https://via.placeholder.com/400x600?text=Manca+Immagine+2D";
+                const src3D = generateGithubUrl(p.img3D) || "https://via.placeholder.com/400x600?text=Manca+Immagine+3D";
 
                 let cardInner = `
                     <div class="image-box">
@@ -508,39 +542,5 @@
                     });
 
                     cardInner += `
-                        <select class="edit-select edit-sub badge">${subOptionsHTML}</select>
-                        <input type="text" class="edit-input edit-title" style="font-weight:bold; font-size:1.1rem;" value="${p.title}">
-                        <input type="text" class="edit-input edit-desc" value="${p.desc}">
-                        
-                        <div style="font-size:0.75rem; color:var(--accent); text-align:left; margin-left:15px;">Nome File 2D / 3D (.jpg di default):</div>
-                        <input type="text" class="edit-input edit-img2d" value="${p.img2D || ''}" placeholder="Nome file 2D (es. elsa_2d.jpg)">
-                        <input type="text" class="edit-input edit-img3d" value="${p.img3D || ''}" placeholder="Nome file 3D (es. elsa_3d.jpg)">
-                        
-                        <input type="text" class="edit-input edit-link" value="${p.link}" placeholder="URL Store">
-                        <select class="edit-select edit-macro" onchange="saveLiveEdits()">
-                            <option value="original" ${p.macro === 'original' ? 'selected' : ''}>Original Concept</option>
-                            <option value="various" ${p.macro === 'various' ? 'selected' : ''}>Various Artists</option>
-                        </select>
-                        <button class="admin-btn" style="width:100%; margin-top:10px;" onclick="removeProduct(${p.id})">❌ Elimina</button>
-                    `;
-                } else {
-                    cardInner += `
-                        <div><span class="badge">${p.sub}</span></div>
-                        <h3>${p.title}</h3>
-                        <p>${p.desc}</p>
-                        <a href="${p.link}" target="_blank" class="btn-link">${translations[currentLang].btnStore}</a>
-                    `;
-                }
-
-                cardInner += `</div>`;
-                card.innerHTML = cardInner;
-                grid.appendChild(card);
-            }
-        });
-    }
-
-    function filterMacro(macro) { selectedMacro = macro; selectedSub = 'all'; document.querySelectorAll('.macro-nav .filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(`macro-${macro}`).classList.add('active'); renderCatalog(); }
-    function filterSub(sub) { selectedSub = sub; renderCatalog(); }
-</script>
-</body>
-</html>
+                        <div style="font-size:0.75rem; color:var(--accent); text-align:left; margin-left:15px; margin-top:5px;">Macro Categoria:</div>
+                        <select class="edit-select edit-macro"
